@@ -10,7 +10,7 @@ int main() {
     const char* eventReadName = "DataReadEvent";
     const int size = 256 * sizeof(wchar_t);  // память для широких символов
 
-    // Создаём события синхронизации
+    // Создаём события о готовности данных и прочтении
     HANDLE hEventReady = CreateEventW(NULL, FALSE, FALSE, L"DataReadyEvent");
     HANDLE hEventRead  = CreateEventW(NULL, FALSE, FALSE, L"DataReadEvent");
     if (!hEventReady || !hEventRead) {
@@ -19,7 +19,7 @@ int main() {
         return 1;
     }
 
-    // Создаём объект разделяемой памяти
+    // Создаём объект разделяемой памяти <
     HANDLE hMapFile = CreateFileMappingW(
         INVALID_HANDLE_VALUE,
         NULL,
@@ -38,7 +38,7 @@ int main() {
         return 1;
     }
 
-    // Отображаем память
+    // Отображаем память <
     wchar_t* data = (wchar_t*)MapViewOfFile(
         hMapFile,
         FILE_MAP_ALL_ACCESS,
@@ -67,7 +67,7 @@ int main() {
     WaitForSingleObject(hEventRead, INFINITE);
     WriteConsoleW(hConsole, L"Получено подтверждение от receiver'а.\n", 40, NULL, NULL);
 
-    // Очистка
+    // Очистка <
     UnmapViewOfFile(data);
     CloseHandle(hMapFile);
     CloseHandle(hEventReady);

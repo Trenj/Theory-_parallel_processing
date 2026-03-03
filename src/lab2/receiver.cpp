@@ -2,9 +2,10 @@
 #include <wchar.h>
 
 int main() {
+    // Получаем дескриптор консоли для вывода
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    // Создаём/открываем события
+    // Создаём события о готовности данных и прочтении
     HANDLE hEventReady = CreateEventW(NULL, FALSE, FALSE, L"DataReadyEvent");
     HANDLE hEventRead  = CreateEventW(NULL, FALSE, FALSE, L"DataReadEvent");
     if (!hEventReady || !hEventRead) {
@@ -49,6 +50,7 @@ int main() {
     // Подтверждаем прочтение
     SetEvent(hEventRead);
 
+    // Очистка
     UnmapViewOfFile(data);
     CloseHandle(hMapFile);
     CloseHandle(hEventReady);
