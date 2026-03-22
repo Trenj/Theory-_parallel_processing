@@ -60,8 +60,7 @@ int main() {
     wcscpy_s(data, size / sizeof(wchar_t), message);
     WriteConsoleW(hConsole, L"Сообщение отправлено.\n", 22, NULL, NULL);
 
-    // Сигнализируем receiver'у
-    SetEvent(hEventReady);
+    SetEvent(hEventReady);  // Сигнализируем receiver'у
 
     // Ждём подтверждения
     WaitForSingleObject(hEventRead, INFINITE);

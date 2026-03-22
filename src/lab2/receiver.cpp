@@ -39,16 +39,14 @@ int main() {
         return 1;
     }
 
-    // Ждём сигнала от sender'а
-    WaitForSingleObject(hEventReady, INFINITE);
+    WaitForSingleObject(hEventReady, INFINITE);     // Ждём сигнала от sender'а
 
     // Выводим сообщение
     wchar_t output[300];
     wsprintfW(output, L"Получено сообщение: %s\n", data);
     WriteConsoleW(hConsole, output, wcslen(output), NULL, NULL);
 
-    // Подтверждаем прочтение
-    SetEvent(hEventRead);
+    SetEvent(hEventRead);   // Подтверждаем прочтение
 
     // Очистка
     UnmapViewOfFile(data);
