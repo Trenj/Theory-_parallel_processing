@@ -2,12 +2,18 @@
 #include <iostream>
 
 int main() {
+
+    // Кодировка сообщений в консоли - UTF-8
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
     const char* pipeName = "\\\\.\\pipe\\MyPipe";
 
     HANDLE hPipe;
 
-    // Ждём пока сервер создаст канал
+    // Ожидание создание канала сервером
     while (true) {
+
         hPipe = CreateFile(
             pipeName,
             GENERIC_READ,
@@ -27,6 +33,7 @@ int main() {
     DWORD bytesRead;
 
     while (true) {
+
         BOOL success = ReadFile(
             hPipe,
             buffer,
@@ -37,9 +44,13 @@ int main() {
         if (!success || bytesRead == 0)
             break;
 
-        std::cout << "Получено: " << buffer << std::endl;
+        std::cout << "Получено сообщение: " << buffer << std::endl;
     }
 
     CloseHandle(hPipe);
+
+    std::cout << "Чтение завершено. Нажмите любую клавишу...\n";
+    system("pause");
+
     return 0;
 }

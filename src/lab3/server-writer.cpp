@@ -1,7 +1,13 @@
 #include <windows.h>
 #include <iostream>
+#include <cstring>
 
 int main() {
+
+    // Устанавливаем UTF-8 кодировку консоли
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
     const char* pipeName = "\\\\.\\pipe\\MyPipe";
 
     HANDLE hPipe = CreateNamedPipe(
@@ -16,13 +22,16 @@ int main() {
 
     if (hPipe == INVALID_HANDLE_VALUE) {
         std::cout << "Ошибка CreateNamedPipe\n";
+        system("pause");
         return 1;
     }
 
     std::cout << "Ожидание подключения клиента...\n";
+
     ConnectNamedPipe(hPipe, NULL);
 
     for (int i = 0; i < 10; ++i) {
+
         const char* message = "Hello!";
         DWORD bytesWritten;
 
@@ -33,11 +42,15 @@ int main() {
             &bytesWritten,
             NULL);
 
-        std::cout << "Отправлено: " << message << std::endl;
+        std::cout << "Отправлено сообщение: " << message << std::endl;
 
         Sleep(2000); // 2 секунды
     }
 
     CloseHandle(hPipe);
+
+    std::cout << "Передача завершена. Нажмите любую клавишу...\n";
+    system("pause");
+
     return 0;
 }
