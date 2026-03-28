@@ -3,17 +3,17 @@
 
 int main() {
 
-    // Кодировка сообщений в консоли - UTF-8
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
     const char* pipeName = "\\\\.\\pipe\\MyPipe";
 
+    // событие подтверждения
+    HANDLE hEventRead = CreateEvent(NULL, FALSE, FALSE, "MessageReadEvent");
+
     HANDLE hPipe;
 
-    // Ожидание создание канала сервером
     while (true) {
-
         hPipe = CreateFile(
             pipeName,
             GENERIC_READ,
@@ -45,9 +45,15 @@ int main() {
             break;
 
         std::cout << "Получено сообщение: " << buffer << std::endl;
+
+        // сигнал серверу: сообщение прочитано
+        SetEvent(hEventRead);
+
+        Sleep(500);
     }
 
     CloseHandle(hPipe);
+    CloseHandle(hEventRead);
 
     std::cout << "Чтение завершено. Нажмите любую клавишу...\n";
     system("pause");

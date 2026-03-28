@@ -4,11 +4,13 @@
 
 int main() {
 
-    // Устанавливаем UTF-8 кодировку консоли
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 
     const char* pipeName = "\\\\.\\pipe\\MyPipe";
+
+    // событие подтверждения
+    HANDLE hEventRead = CreateEvent(NULL, FALSE, FALSE, "MessageReadEvent");
 
     HANDLE hPipe = CreateNamedPipe(
         pipeName,
@@ -44,10 +46,12 @@ int main() {
 
         std::cout << "Отправлено сообщение: " << message << std::endl;
 
-        Sleep(2000); // 2 секунды
+        // ждём, пока клиент прочитает
+        WaitForSingleObject(hEventRead, INFINITE);
     }
 
     CloseHandle(hPipe);
+    CloseHandle(hEventRead);
 
     std::cout << "Передача завершена. Нажмите любую клавишу...\n";
     system("pause");
