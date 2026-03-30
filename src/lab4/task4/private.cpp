@@ -1,29 +1,26 @@
-#include <iostream>
+#include <stdio.h>
 #include <omp.h>
+#include <unistd.h>
 
 int main() {
     int k;
-    std::cout << "Введите количество потоков: ";
-    std::cin >> k;
-    
+    printf("Введите количество потоков: ");
+    scanf("%d", &k);
+
     if (k <= 0) {
-        std::cerr << "Ошибка: k должно быть положительным!" << std::endl;
+        printf("Ошибка: количество потоков должно быть положительным!\n");
         return 1;
     }
-    
+
+    int rank;
     omp_set_num_threads(k);
-    
-    int rank;  // Объявлена до параллельной области
-    
-    #pragma omp parallel private(rank)  // Каждая нить получает свою копию!
+
+    #pragma omp parallel private(rank)
     {
-        rank = omp_get_thread_num();  // Теперь безопасно!
-        
-        #pragma omp critical
-        {
-            printf("I am %d thread.\n", rank);
-        }
+        rank = omp_get_thread_num(); // каждый поток пишет в свою копию
+        usleep(100);
+        printf("I am %d thread.\n", rank);
     }
-    
+
     return 0;
 }

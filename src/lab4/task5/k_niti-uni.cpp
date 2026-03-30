@@ -1,65 +1,49 @@
-#include <iostream>
+#include <stdio.h>
 #include <omp.h>
-#include <algorithm> // для min
-
-using namespace std;
 
 int main() {
     int k, N;
-    cout << "Введите k (кол-во потоков): ";
-    cin >> k;
-    cout << "Введите N (кол-во чисел): ";
-    cin >> N;
+    printf("Введите количество потоков: ");
+    scanf("%d", &k);
+    printf("Введите N: ");
+    scanf("%d", &N);
 
-    long long total_sum = 0;
-
-    // Устанавливаем количество потоков
-    omp_set_num_threads(k);
-
-    #pragma omp parallel reduction(+:total_sum)
-    {
-        int tid = omp_get_thread_num();
-        int num_threads = omp_get_num_threads();
-        long long partial_sum = 0;
-
-        // Математическое распределение диапазонов для k потоков
-        // Базовое количество чисел на поток
-        int base_count = N / num_threads;
-        // Остаток, который распределяется по первым потокам
-        int remainder = N % num_threads;
-
-        // Сколько чисел достанется этому потоку
-        int my_count = base_count + (tid < remainder ? 1 : 0);
-
-        // Вычисляем начальный индекс для этого потока
-        // Потоки с id < remainder имеют размер base_count + 1
-        // Потоки с id >= remainder имеют размер base_count
-        int start_index;
-        if (tid < remainder) {
-            start_index = tid * (base_count + 1) + 1;
-        } else {
-            start_index = remainder * (base_count + 1) + (tid - remainder) * base_count + 1;
-        }
-
-        int end_index = start_index + my_count - 1;
-
-        // Вычисление частичной суммы
-        for (int i = start_index; i <= end_index; ++i) {
-            partial_sum += i;
-        }
-
-        // Обновление общей суммы (механизм reduction)
-        total_sum += partial_sum;
-
-        // Вывод частичной суммы
-        #pragma omp critical
-        {
-            cout << "[" << tid << "]: Sum = " << partial_sum << endl;
-        }
+    if (k <= 0 || N <= 0) {
+        printf("Ошибка: k и N должны быть положительными!\n");
+        return 1;
     }
 
-    // Вывод общей суммы
-    cout << "Sum = " << total_sum << endl;
+    int sum = 0;
+    int partial_sum = 0;
+
+    omp_set_num_threads(k);
+
+    #pragma omp parallel private(partial_sum) reduction(+:sum)
+    {
+        int thread_id = omp_get_thread_num();
+        int total = omp_get_num_threads();
+        partial_sum = 0;
+
+        // каждый поток получает свой диапазон [start, end]
+        int chunk = N / total;         // размер куска на каждый поток
+        int start = thread_id * chunk + 1;
+        int end = (thread_id == total - 1) ? N : start + chunk - 1;
+        // последний поток забирает остаток если N не делится на k
+
+        for (int i = start; i <= end; i++)
+            partial_sum += i;
+
+        printf("[%d]: Sum = %d\n", thread_id, partial_sum);
+        sum += partial_sum;
+    }
+
+    printf("Sum = %d\n", sum);
 
     return 0;
 }
+```
+
+Проверь на примерах из задания:
+```
+k=3, N=2:
+  chunk = 2/3 = 0  ← поток 0: [1,0] = пустой диапазон, sum=0...

@@ -1,54 +1,41 @@
-#include <iostream>
+#include <stdio.h>
 #include <omp.h>
-
-using namespace std;
 
 int main() {
     int N;
-    cout << "Введите N: ";
-    cin >> N;
+    printf("Введите N: ");
+    scanf("%d", &N);
 
-    long long total_sum = 0;
-
-    // Запускаем параллельную область с 2 потоками
-    // reduction(+:total_sum) автоматически суммирует локальные суммы потоков
-    #pragma omp parallel num_threads(2) reduction(+:total_sum)
-    {
-        int tid = omp_get_thread_num();
-        long long partial_sum = 0;
-        int start, end;
-
-        // Распределение работы с помощью оператора if
-        if (tid == 0) {
-            // Поток 0 считает от 1 до N/2
-            start = 1;
-            end = N / 2;
-        } else {
-            // Поток 1 считает от N/2 + 1 до N
-            start = N / 2 + 1;
-            end = N;
-        }
-
-        // Вычисление частичной суммы
-        for (int i = start; i <= end; ++i) {
-            partial_sum += i;
-        }
-
-        // Добавляем частичную сумму в общую (через механизм reduction)
-        // В явном виде внутри reduction это делается автоматически, 
-        // но переменная partial_sum локальна для потока.
-        // Чтобы reduction сработал, мы должны добавить partial_sum в total_sum
-        total_sum += partial_sum; 
-
-        // Вывод частичной суммы (защищаем вывод критической секцией, чтобы строки не перемешались)
-        #pragma omp critical
-        {
-            cout << "[" << tid << "]: Sum = " << partial_sum << endl;
-        }
+    if (N <= 0) {
+        printf("Ошибка: N должно быть положительным!\n");
+        return 1;
     }
 
-    // Вывод общей суммы (выполняется одним потоком после завершения parallel)
-    cout << "Sum = " << total_sum << endl;
+    int sum = 0;
+    int partial_sum = 0;
+
+    omp_set_num_threads(2);
+
+    #pragma omp parallel private(partial_sum) reduction(+:sum)
+    {
+        int thread_id = omp_get_thread_num();
+        partial_sum = 0;
+
+        if (thread_id == 0) {
+            // поток 0 считает от 1 до N/2
+            for (int i = 1; i <= N / 2; i++)
+                partial_sum += i;
+        } else {
+            // поток 1 считает от N/2+1 до N
+            for (int i = N / 2 + 1; i <= N; i++)
+                partial_sum += i;
+        }
+
+        printf("[%d]: Sum = %d\n", thread_id, partial_sum);
+        sum += partial_sum; // reduction суммирует копии sum со всех потоков
+    }
+
+    printf("Sum = %d\n", sum);
 
     return 0;
 }
