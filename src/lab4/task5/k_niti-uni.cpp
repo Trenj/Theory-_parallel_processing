@@ -24,14 +24,19 @@ int main() {
         int total = omp_get_num_threads();
         partial_sum = 0;
 
-        // каждый поток получает свой диапазон [start, end]
-        int chunk = N / total;         // размер куска на каждый поток
-        int start = thread_id * chunk + 1;
-        int end = (thread_id == total - 1) ? N : start + chunk - 1;
-        // последний поток забирает остаток если N не делится на k
+        if (N >= total) {
+            // блочное распределение: каждый поток получает непрерывный диапазон
+            int chunk = N / total;
+            int start = thread_id * chunk + 1;
+            int end = (thread_id == total - 1) ? N : start + chunk - 1;
 
-        for (int i = start; i <= end; i++)
-            partial_sum += i;
+            for (int i = start; i <= end; i++)
+                partial_sum += i;
+        } else {
+            // чередование: каждый поток берёт одно число (или ничего если N < thread_id)
+            for (int i = thread_id + 1; i <= N; i += total)
+                partial_sum += i;
+        }
 
         printf("[%d]: Sum = %d\n", thread_id, partial_sum);
         sum += partial_sum;
@@ -41,9 +46,3 @@ int main() {
 
     return 0;
 }
-```
-
-Проверь на примерах из задания:
-```
-k=3, N=2:
-  chunk = 2/3 = 0  ← поток 0: [1,0] = пустой диапазон, sum=0...
