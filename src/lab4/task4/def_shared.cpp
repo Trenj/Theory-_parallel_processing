@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <omp.h>
-#include <unistd.h> // для usleep
+#include <unistd.h>    // для usleep
 
 int main() {
     int k;
@@ -12,13 +12,13 @@ int main() {
         return 1;
     }
 
-    int rank; // shared по умолчанию — общая для всех потоков
+    int rank;   // shared по умолчанию — общая для всех потоков
     omp_set_num_threads(k);
 
     #pragma omp parallel shared(rank)
     {
         rank = omp_get_thread_num();
-        usleep(100); // имитация долгих вычислений — гонка станет заметнее
+        usleep(100);    // имитация долгих вычислений (гонка станет заметнее)
         printf("I am %d thread.\n", rank);
     }
 

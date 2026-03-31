@@ -1,15 +1,15 @@
-#include <iostream>
+#include <cstdio>
 #include <omp.h>
 
 int main() {
     int k;
 
-    std::cout << "Введите количество потоков: ";
-    std::cin >> k;
+    printf("Введите количество потоков: ");
+    scanf("%d", &k);
 
     // Проверка корректности ввода
     if (k <= 0) {
-        std::cerr << "Ошибка: количество потоков должно быть положительным!" << std::endl;
+        printf("Ошибка: количество потоков должно быть положительным!\n");
         return 1;
     }
 
@@ -20,13 +20,9 @@ int main() {
         int thread_id = omp_get_thread_num();
         int total_threads = omp_get_num_threads();
 
-        #pragma omp critical
-        {
-            std::cout << "I am " << thread_id
-                      << " thread from " << total_threads
-                      << " threads!" << std::endl;
+        printf("I am %d thread from %d threads!\n", thread_id, total_threads);
+
         }
-    }
 
     return 0;
 }
