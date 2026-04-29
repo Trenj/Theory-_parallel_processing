@@ -85,19 +85,28 @@ mpirun -np 2 ./send_recv
 
 ### CUDA
 
-CUDA-лабораторные оформлены в виде Jupyter notebook:
+CUDA-лабораторные оформлены в виде Jupyter notebook и выполнялись в Google Colab, так как локальная CUDA-совместимая видеокарта отсутствует.
+
+Ноутбуки:
 
 - `labs/lab-06-cuda-hello-world/notebooks/Lab6.ipynb`
 - `labs/lab-07-cuda-vector-addition/notebooks/Lab7.ipynb`
 - `labs/lab-08-cuda-pi/notebooks/Lab8.ipynb`
 
-Для их запуска потребуется Python-среда с Jupyter и настроенной CUDA Toolkit.
+Рекомендуемый сценарий запуска:
+
+- открыть notebook в Google Colab
+- включить GPU через `Runtime` → `Change runtime type` → `T4 GPU` или другой доступный ускоритель
+- запускать ячейки последовательно
+
+Локальный запуск возможен только при наличии настроенной CUDA Toolkit и совместимого GPU.
 
 ## Замечания по платформе
 
 - `lab-02` и `lab-03` используют WinAPI и ориентированы на Windows.
 - `lab-04` и `lab-05` удобно запускать на Linux с GCC/OpenMPI.
-- `lab-06` - `lab-08` требуют доступной CUDA-среды и совместимого GPU.
+- `lab-06` - `lab-08` были выполнены в Google Colab и рассчитаны в первую очередь на запуск в Colab с GPU runtime.
+- Локальный запуск `lab-06` - `lab-08` потребует CUDA-среду и совместимый GPU.
 
 ## Что изменено
 
